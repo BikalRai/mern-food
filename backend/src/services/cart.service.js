@@ -10,6 +10,7 @@ module.exports = {
   },
 
   async findCartByUserId(userId) {
+    console.log(userId, "id from cart");
     let cart;
 
     cart = await Cart.findOne({ customer: userId }).populate([
@@ -27,7 +28,6 @@ module.exports = {
     }
 
     let cartItems = await CartItem.find({ cart: cart._id }).populate("food");
-
 
     let totalPrice = 0;
     let totalDiscountedPrice = 0;

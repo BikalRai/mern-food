@@ -1,13 +1,13 @@
 const bcrypt = require("bcrypt");
-require('dotenv').config();
+require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const { v4: uuidv4 } = require("uuid");
 const User = require("../models/user.model");
 const jwtProvider = require("../config/jwtProvider.js");
 const PasswordResetToken = require("../models/passwordResetToken.model.js");
-const EMAIL=process.env.EMAIL
-const EMAIL_PASS=process.env.PASS
+const EMAIL = process.env.EMAIL;
+const EMAIL_PASS = process.env.PASS;
 
 module.exports = {
   async createUser(userData) {
@@ -43,7 +43,7 @@ module.exports = {
       const user = await User.findOne({ email });
 
       if (!user) {
-        throw new Error("user found with email : ", email);
+        throw new Error(`User not found with email: ${email}`);
       }
 
       return user;
@@ -112,7 +112,7 @@ module.exports = {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       user.password = hashedPassword;
 
-      console.log("user",user)
+      console.log("user", user);
       await user.save();
     } catch (error) {
       throw new Error(`Error updating password: ${error.message}`);
@@ -139,7 +139,7 @@ module.exports = {
         },
       });
 
-      console.log(EMAIL,EMAIL_PASS)
+      console.log(EMAIL, EMAIL_PASS, "hello");
 
       await transporter.sendMail({
         from: EMAIL,

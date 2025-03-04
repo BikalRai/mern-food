@@ -9,15 +9,16 @@ module.exports = {
   async createOrder(order, user) {
     try {
       const address = order.deliveryAddress;
+
       let savedAddress;
       if (address._id) {
         const isAddressExist = await Address.findById(address._id);
         if (isAddressExist) {
           savedAddress = isAddressExist;
-        } else {
-          const shippingAddress = new Address(order.deliveryAddress);
-          savedAddress = await shippingAddress.save();
         }
+      } else {
+        const shippingAddress = new Address(order.deliveryAddress);
+        savedAddress = await shippingAddress.save();
       }
 
       if (!user.addresses.includes(savedAddress._id)) {
@@ -26,11 +27,13 @@ module.exports = {
       }
 
       const restaurant = await Restaurant.findById(order.restaurantId);
+      console.log("restaurant:", restaurant);
       if (!restaurant) {
         throw new Error(`Restaurant not found with ID ${order.restaurantId}`);
       }
 
       const cart = await cartService.findCartByUserId(user._id);
+      console.log("cart in service:", cart);
 
       if (!cart) {
         throw new Error("cart not found");
@@ -71,6 +74,7 @@ module.exports = {
       return paymentResponse;
       // return savedOrder
     } catch (error) {
+      console.log("failed to create order", error.message);
       throw new Error(`Failed to create order: ${error.message}`);
     }
   },
@@ -102,7 +106,8 @@ module.exports = {
   async getUserOrders(userId) {
     try {
       const orders = await Order.find({ customer: userId }).populate({
-        path: "items",populate:{path:"food"}
+        path: "items",
+        populate: { path: "food" },
       });
       return orders;
     } catch (error) {
@@ -112,9 +117,13 @@ module.exports = {
 
   async getOrdersOfRestaurant(restaurantId, orderStatus) {
     try {
-      let orders = await Order.find({ restaurant: restaurantId }).populate([{
-        path: "items",populate:{path:"food"}
-      },'customer']);
+      let orders = await Order.find({ restaurant: restaurantId }).populate([
+        {
+          path: "items",
+          populate: { path: "food" },
+        },
+        "customer",
+      ]);
       if (orderStatus) {
         orders = orders.filter((order) => order.orderStatus === orderStatus);
       }
@@ -139,7 +148,8 @@ module.exports = {
       }
 
       const order = await Order.findById(orderId).populate({
-        path: "items",populate:{path:"food"}
+        path: "items",
+        populate: { path: "food" },
       });
       if (!order) {
         throw new Error(`Order not found with ID ${orderId}`);

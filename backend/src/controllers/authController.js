@@ -16,10 +16,43 @@ const register = async (req, res) => {
     return res.status(500).send({ error: error.message });
   }
 };
+
+// const login = async (req, res) => {
+//   const { password, email } = req.body;
+
+//   try {
+//     const user = await userService.getUserByEmail(email);
+
+//     console.log(user, "get user from db");
+
+//     if (!user) {
+//       return res
+//         .status(404)
+//         .json({ message: "User not found With Email ", email });
+//     }
+
+//     const isPasswordValid = bcrypt.compare(password, user.password);
+
+//     if (!isPasswordValid) {
+//       return res.status(401).json({ message: "Invalid password" });
+//     }
+
+//     const jwt = jwtProvider.generateToken(user._id);
+
+//     return res.status(200).send({ jwt, message: "login success" });
+//   } catch (error) {
+//     console.log("error", error.message);
+//     return res.status(500).send({ error: error.message });
+//   }
+// };
+
 const login = async (req, res) => {
   const { password, email } = req.body;
+
   try {
     const user = await userService.getUserByEmail(email);
+
+    console.log(user, "get user from db");
 
     if (!user) {
       return res
@@ -27,7 +60,7 @@ const login = async (req, res) => {
         .json({ message: "User not found With Email ", email });
     }
 
-    const isPasswordValid = bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password); // Await the result
 
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid password" });
@@ -37,6 +70,7 @@ const login = async (req, res) => {
 
     return res.status(200).send({ jwt, message: "login success" });
   } catch (error) {
+    console.error("Login error:", error); // Log the error
     return res.status(500).send({ error: error.message });
   }
 };
@@ -79,7 +113,7 @@ const resetPassword = async (req, res) => {
 
 const resetPasswordRequest = async (req, res) => {
   try {
-    const { email } = req.query;
+    const { email } = req.body;
 
     const user = await userService.getUserByEmail(email);
 

@@ -35,8 +35,6 @@ import {
 //   };
 // };
 
-
-
 export const createOrder = (reqData) => {
   return async (dispatch) => {
     dispatch(createOrderRequest());
@@ -46,10 +44,10 @@ export const createOrder = (reqData) => {
     console.log("JWT Token:", reqData.jwt);
 
     try {
-      const { data } = await api.post('/api/order', reqData.order, {
+      const { data } = await api.post("/api/order", reqData.order, {
         headers: {
           Authorization: `Bearer ${reqData.jwt}`,
-          "Content-Type": "application/json",  // Ensure JSON format
+          "Content-Type": "application/json", // Ensure JSON format
         },
       });
 
